@@ -318,9 +318,10 @@
 	"begin_code.h"
 	"close_code.h"
 
-1456726506 source:c:\users\chris\desktop\github\ce101-final-project\main.cpp
+1456900997 source:c:\users\chris\desktop\github\ce101-final-project\main.cpp
 	<SDL2/SDL.h>
 	<stdio.h>
+	"tinyfiledialogs.h"
 
 1456726503 c:\users\chris\desktop\github\ce101-final-project\sdl2-2.0.4\i686-w64-mingw32\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -640,4 +641,32 @@
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
+
+1456854632 c:\users\chris\desktop\github\ce101-final-project\tiny\tinyfiledialogs.h
+	<stdio.h>
+	"tinyfiledialogs.h"
+
+1456854632 c:\users\chris\desktop\github\ce101-final-project\tiny\\tinyfiledialogs.h
+	<stdio.h>
+	"tinyfiledialogs.h"
+
+1456854632 c:\users\chris\desktop\github\ce101-final-project\sdl2-2.0.4\i686-w64-mingw32\include\tiny\tinyfiledialogs.h
+	<stdio.h>
+	"tinyfiledialogs.h"
+
+1456881247 source:c:\users\chris\desktop\github\ce101-final-project\tinyfiledialogs.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"tinyfiledialogs.h"
+	<windows.h>
+	<Shlobj.h>
+	<sys/stat.h>
+	<conio.h>
+	<limits.h>
+	<unistd.h>
+	<dirent.h>
+	<termios.h>
+	<sys/utsname.h>
 

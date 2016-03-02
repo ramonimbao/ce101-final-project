@@ -152,7 +152,7 @@ UNIX :
 $ gcc -o hello hello.c tinyfiledialogs.c
 
 MinGW :
-> gcc -o hello.exe hello.c tinyfiledialogs.c -LC:/mingw/lib -lcomdlg32
+> gcc -o hello.exe hello.c tinyfiledialogs.c -LC:/mingw/lib -lcomdlg32 -lole32 -loleaut32
 
 VisualStudio :
   Create a console application project, it links against Comdlg32.lib.
