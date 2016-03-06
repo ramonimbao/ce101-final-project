@@ -318,10 +318,13 @@
 	"begin_code.h"
 	"close_code.h"
 
-1456900997 source:c:\users\chris\desktop\github\ce101-final-project\main.cpp
+1457243339 source:c:\users\chris\desktop\github\ce101-final-project\main.cpp
 	<SDL2/SDL.h>
 	<stdio.h>
 	"tinyfiledialogs.h"
+	<SDL2/SDL_opengl.h>
+	"imgui.h"
+	"imgui_impl_sdl.h"
 
 1456726503 c:\users\chris\desktop\github\ce101-final-project\sdl2-2.0.4\i686-w64-mingw32\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -655,6 +658,129 @@
 	"tinyfiledialogs.h"
 
 1456881247 source:c:\users\chris\desktop\github\ce101-final-project\tinyfiledialogs.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"tinyfiledialogs.h"
+	<windows.h>
+	<Shlobj.h>
+	<sys/stat.h>
+	<conio.h>
+	<limits.h>
+	<unistd.h>
+	<dirent.h>
+	<termios.h>
+	<sys/utsname.h>
+
+1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui.h
+	"imconfig.h"
+	<float.h>
+	<stdarg.h>
+	<stddef.h>
+	<string.h>
+	<assert.h>
+	"imgui_user.h"
+
+1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\imconfig.h
+
+1457232602 c:\users\chris\desktop\github\ce101-final-project\imgui_impl_sdl.h
+
+1456726503 c:\users\chris\desktop\github\ce101-final-project\sdl2-2.0.4\i686-w64-mingw32\include\sdl2\sdl_opengl.h
+	"SDL_config.h"
+	"gl_mangle.h"
+	<windows.h>
+	"SDL_opengl_glext.h"
+
+1456726503 c:\users\chris\desktop\github\ce101-final-project\sdl2-2.0.4\i686-w64-mingw32\include\sdl2\sdl_opengl_glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1457232602 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_impl_sdl.h
+
+1457238902 source:c:\users\chris\desktop\github\ce101-final-project\imgui_impl_sdl.cpp
+	<SDL2/SDL.h>
+	<SDL2/SDL_syswm.h>
+	<SDL2/SDL_opengl.h>
+	<imgui.h>
+	"imgui_impl_sdl.h"
+
+1456726503 c:\users\chris\desktop\github\ce101-final-project\sdl2-2.0.4\i686-w64-mingw32\include\sdl2\sdl_syswm.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_version.h"
+	"begin_code.h"
+	<windows.h>
+	<Inspectable.h>
+	<X11/Xlib.h>
+	<X11/Xatom.h>
+	<directfb.h>
+	<UIKit/UIKit.h>
+	"close_code.h"
+
+1457244021 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui.cpp
+	"imgui.h"
+	"imgui_internal.h"
+	<ctype.h>
+	<math.h>
+	<stdlib.h>
+	<stdio.h>
+	<stddef.h>
+	<stdint.h>
+	"stb_textedit.h"
+	<windows.h>
+	<imm.h>
+	"imgui_user.inl"
+
+1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_internal.h
+	<stdio.h>
+	<math.h>
+	"stb_textedit.h"
+
+1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_textedit.h
+	<string.h>
+
+1457232603 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_demo.cpp
+	"imgui.h"
+	<ctype.h>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdint.h>
+
+1457232603 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_draw.cpp
+	"imgui.h"
+	"imgui_internal.h"
+	<stdio.h>
+	<malloc.h>
+	<alloca.h>
+	"stb_rect_pack.h"
+	"stb_truetype.h"
+
+1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_rect_pack.h
+	<stdlib.h>
+	<assert.h>
+
+1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_truetype.h
+	"stb_truetype.h"
+	<stdio.h>
+	"stb_truetype.h"
+	<math.h>
+	<math.h>
+	<stdlib.h>
+	<assert.h>
+	<string.h>
+	<memory.h>
+
+1456881247 source:c:\users\chris\desktop\github\ce101-final-project\tiny\tinyfiledialogs.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>

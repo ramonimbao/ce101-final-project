@@ -32,12 +32,62 @@
 			<Add option="-Wall" />
 			<Add option="-v" />
 			<Add directory="SDL2-2.0.4/i686-w64-mingw32/include" />
+			<Add directory="tiny" />
+			<Add directory="imgui" />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2" />
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lcomdlg32 -lole32 -loleaut32" />
+			<Add option="-lglu32 -lopengl32" />
+			<Add option="-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32" />
+			<Add option="-lshell32 -lversion -luuid" />
 			<Add directory="SDL2-2.0.4/i686-w64-mingw32/lib" />
+			<Add directory="tiny" />
+			<Add directory="imgui" />
 		</Linker>
+		<Unit filename="imgui/.travis.yml">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/imconfig.h">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/imgui.cpp">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/imgui.h">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/imgui_demo.cpp">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/imgui_draw.cpp">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/imgui_internal.h">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/stb_rect_pack.h">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/stb_textedit.h">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui/stb_truetype.h">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui_impl_sdl.cpp">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="imgui_impl_sdl.h">
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="main.cpp" />
+		<Unit filename="tiny/tinyfiledialogs.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="tiny/tinyfiledialogs.h">
+			<Option target="Release" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
