@@ -41,6 +41,8 @@ int main(int argc, char* args[])
         SDL_WINDOW_SHOWN
     );
 
+    button = SDL_CreateWindow(TEXT("Button"), 10, 11, 50, 50,SDL_WINDOW_SHOWN);
+
     if (window == NULL)
     {
         printf(
@@ -86,4 +88,31 @@ int main(int argc, char* args[])
 }
 
 #pragma warning(default:4996)
+
+#Button
+class Button {
+public:
+    int x;
+    int y;
+    int w;
+    int h;
+    string bname = "ENTER";
+    void OnClick(){
+    };
+    SDL_Surface bButton;
+
+};
+
+class ScrollBar {
+    //horizontal
+    int x;
+    int y;
+    int w;
+    int h;
+    double sValue;
+    void OnClick(){
+    };
+    SDL_Surface sBar;
+};
+
 
