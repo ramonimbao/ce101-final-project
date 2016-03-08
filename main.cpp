@@ -2,7 +2,9 @@
 
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include <string>
 #include "tinyfiledialogs.h"
+#include <iostream>
 
 // For imgui
 #include <SDL2/SDL_opengl.h>
@@ -11,73 +13,89 @@
 
 #pragma warning(disable:4996) /* allows usage of strncpy, strcpy, st-rcat, sprintf, fopen */
 
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 700;
+const int SCREEN_WIDTH = 300;
+const int SCREEN_HEIGHT = 120;
+const char* inImage = "Original";
+const char* outImage = "Anti-aliased";
+
+void loadWindow(std::string path, const char* name, SDL_Window* windowToLoad, SDL_Renderer* rendererToUse, SDL_Surface* surfaceToUse) {
+    windowToLoad = SDL_CreateWindow(
+                                    name,
+                                    SDL_WINDOWPOS_CENTERED,
+                                    SDL_WINDOWPOS_CENTERED,
+                                    640,
+                                    480,
+                                    SDL_WINDOW_SHOWN);
+    if (windowToLoad == NULL) printf("Window could not be created! Error: %s\n", SDL_GetError());
+
+    rendererToUse = SDL_CreateRenderer(windowToLoad, -1, SDL_RENDERER_ACCELERATED);
+    if (rendererToUse == NULL) printf("Renderer could not be created! Error: %s\n", SDL_GetError());
+
+    SDL_Surface* loadedSurface = SDL_LoadBMP(path.c_str());
+    if (loadedSurface == NULL) {
+        printf("Unable to load image %s! Error: %s\n", path.c_str(), SDL_GetError());
+    } else {
+        surfaceToUse = SDL_GetWindowSurface(windowToLoad);
+        SDL_BlitSurface(loadedSurface,NULL, surfaceToUse, NULL);
+        SDL_UpdateWindowSurface(windowToLoad);
+
+        SDL_FreeSurface(loadedSurface);
+    }
+}
+
 
 int main(int argc, char* args[])
 {
-	// Setup file opener
-	char const * lTheOpenFileName;
-	FILE * lIn;
+    // tinyfiledialog picker
+    char const * tfdOpen;
 
-//	lTheOpenFileName = tinyfd_openFileDialog("Get Image File","",0,NULL,NULL,0);
+    // prepare windows, renderers, surfaces
+    SDL_Window* mainWindow = NULL;
+    SDL_Window* inWindow = NULL;
+    SDL_Window* outWindow = NULL;
 
-    // Window setup
-    SDL_Window* window = NULL;
+    SDL_Renderer* mainRenderer = NULL; //unused?
+    SDL_Renderer* inRenderer = NULL;
+    SDL_Renderer* outRenderer = NULL;
 
-    SDL_Surface* screenSurface = NULL;
+    SDL_Surface* mainSurface = NULL; //unused?
+    SDL_Surface* inSurface = NULL;
+    SDL_Surface* outSurface = NULL;
 
-    SDL_Surface* imageToLoad = NULL;
+    if(SDL_Init(SDL_INIT_EVERYTHING) != 0) printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
 
-//    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-//    {
-//        printf(
-//            "SDL could not initialize! SDL Error: %s\n",
-//            SDL_GetError()
-//        );
-//    }
-
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
-        printf(
-            "SDL could not initialize! SDL Error: %s\n",
-            SDL_GetError()
-        );
-    }
-
-    //Setup window
+    //setup openGL stuff for imgui
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    window = SDL_CreateWindow(
-        "CE101 Final Project (Bermejo, Corpuz, Imbao)",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE
-//        SDL_WINDOW_SHOWN
+    mainWindow = SDL_CreateWindow(
+     "CE101 Project (Bermejo, Corpuz, Imbao)",
+     SDL_WINDOWPOS_CENTERED,
+     SDL_WINDOWPOS_CENTERED,
+     SCREEN_WIDTH,
+     SCREEN_HEIGHT,
+     SDL_WINDOW_OPENGL
+     // SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE
+     // SDL_WINDOW_SHOWN
     );
 
-    SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+    SDL_GLContext glContext = SDL_GL_CreateContext(mainWindow);
 
-    // Setup ImGui binding
+    //Setup imgui binding
     ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize.x = 1000.0f;
-        io.DisplaySize.y = 700.0f;
+        io.DisplaySize.x = 460.0f;
+        io.DisplaySize.y = 680.0f;
         io.IniFilename = "antialias.ini";
         io.DeltaTime = (1.0f/60.0f);
 
-    ImGui_ImplSdl_Init(window);
+    ImGui_ImplSdl_Init(mainWindow);
 
-    bool show_test_window = false;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImColor(114, 144, 154);
-
-    // Main loop
+    ImVec4 bgColor = ImColor(114,144,154);
+    bool showmainWindow = false;
+    // Main Loop
     bool done = false;
     while (!done)
     {
@@ -88,96 +106,60 @@ int main(int argc, char* args[])
             if (event.type == SDL_QUIT)
                 done = true;
         }
-        ImGui_ImplSdl_NewFrame(window);
+        ImGui_ImplSdl_NewFrame(mainWindow);
 
-        // 1. Show a simple window
-        // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+        // Main UI
         {
-            static float f = 0.0f;
-            ImGui::Begin("Supersampling Anti-aliasing", &show_test_window);
+            static float bg_alpha = -0.01f;
+            static int i = 0;
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+
+            ImGui::Begin("Supersampling Anti-aliasing", &showmainWindow, ImVec2(294,112), bg_alpha, window_flags);
             if (ImGui::Button("Load Image")) {
-//              show_test_window ^= 1;
-                lTheOpenFileName = tinyfd_openFileDialog("Get Image File","",0,NULL,NULL,0);
+                tfdOpen = tinyfd_openFileDialog("Load Image File", "", 0,NULL, NULL, 0);
+                printf("%s\n",tfdOpen);
+                loadWindow(tfdOpen, inImage, inWindow, inRenderer, inSurface);
+                //TODO: Create image loading function here
             }
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
+            ImGui::Text("Anti-aliasing Factor");
+            ImGui::SliderInt("", &i, 0, 10);
+            if (ImGui::Button("Apply")) {
+                //TODO: Add loading image here
+            }
             ImGui::End();
         }
 
-        // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
-        {
-            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello");
-            ImGui::End();
-        }
-
-        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
-        {
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
-        }
-
-        // Rendering
-        glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        // Render imgui to window
+        glViewport(0,0,(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
+        glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
-        SDL_GL_SwapWindow(window);
+        SDL_GL_SwapWindow(mainWindow);
     }
 
-    // Cleanup
-    ImGui_ImplSdl_Shutdown();
-    SDL_GL_DeleteContext(glcontext);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    // Cleanupgithub
+    // close();
+    SDL_DestroyRenderer(inRenderer);
+    SDL_DestroyRenderer(outRenderer);
+    SDL_DestroyWindow(inWindow);
+    SDL_DestroyWindow(outWindow);
 
-//    if (window == NULL)
-//    {
-//        printf(
-//            "Window could not be created! SDL Error: %s\n",
-//            SDL_GetError()
-//        );
-//    }
-//    else
-//    {
-//        printf(lTheOpenFileName);
-//        screenSurface = SDL_GetWindowSurface(window);
-//        imageToLoad = SDL_LoadBMP(lTheOpenFileName);
-//
-//        // Apply image
-//        SDL_BlitSurface( imageToLoad, NULL, screenSurface, NULL );
-//        SDL_UpdateWindowSurface( window );
-//    }
-//
-//    // Main loop and window event handling
-//    bool quit = false;
-//
-//    SDL_Event e;
-//
-//    while (!quit)
-//    {
-//        while (SDL_PollEvent(&e) != 0)
-//        {
-//            if (e.type == SDL_QUIT)
-//            {
-//                quit = true;
-//            }
-//        }
-//
-//        // Actual main loop
-//        SDL_UpdateWindowSurface(window);
-//    }
-//
-//    // Cleanup
-//    SDL_DestroyWindow(window);
-//    SDL_Quit();
+    inRenderer = NULL;
+    outRenderer = NULL;
+    inWindow = NULL;
+    outWindow = NULL;
+
+    ImGui_ImplSdl_Shutdown();
+    SDL_GL_DeleteContext(glContext);
+    SDL_DestroyWindow(mainWindow);
+    SDL_Quit();
 
     return 0;
 }
+
+
+
+
 
 #pragma warning(default:4996)
 

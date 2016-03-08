@@ -318,10 +318,12 @@
 	"begin_code.h"
 	"close_code.h"
 
-1457243339 source:c:\users\chris\desktop\github\ce101-final-project\main.cpp
+1457447150 source:c:\users\chris\desktop\github\ce101-final-project\main.cpp
 	<SDL2/SDL.h>
 	<stdio.h>
+	<string>
 	"tinyfiledialogs.h"
+	<iostream>
 	<SDL2/SDL_opengl.h>
 	"imgui.h"
 	"imgui_impl_sdl.h"
@@ -673,7 +675,7 @@
 	<termios.h>
 	<sys/utsname.h>
 
-1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui.h
+1457246439 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui.h
 	"imconfig.h"
 	<float.h>
 	<stdarg.h>
@@ -682,7 +684,7 @@
 	<assert.h>
 	"imgui_user.h"
 
-1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\imconfig.h
+1457246439 c:\users\chris\desktop\github\ce101-final-project\imgui\imconfig.h
 
 1457232602 c:\users\chris\desktop\github\ce101-final-project\imgui_impl_sdl.h
 
@@ -725,7 +727,7 @@
 	<UIKit/UIKit.h>
 	"close_code.h"
 
-1457244021 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui.cpp
+1457246525 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui.cpp
 	"imgui.h"
 	"imgui_internal.h"
 	<ctype.h>
@@ -739,15 +741,15 @@
 	<imm.h>
 	"imgui_user.inl"
 
-1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_internal.h
+1457246439 c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_internal.h
 	<stdio.h>
 	<math.h>
 	"stb_textedit.h"
 
-1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_textedit.h
+1457246439 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_textedit.h
 	<string.h>
 
-1457232603 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_demo.cpp
+1457246439 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_demo.cpp
 	"imgui.h"
 	<ctype.h>
 	<math.h>
@@ -756,7 +758,7 @@
 	<stddef.h>
 	<stdint.h>
 
-1457232603 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_draw.cpp
+1457246439 source:c:\users\chris\desktop\github\ce101-final-project\imgui\imgui_draw.cpp
 	"imgui.h"
 	"imgui_internal.h"
 	<stdio.h>
@@ -765,11 +767,11 @@
 	"stb_rect_pack.h"
 	"stb_truetype.h"
 
-1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_rect_pack.h
+1457246439 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_rect_pack.h
 	<stdlib.h>
 	<assert.h>
 
-1457232603 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_truetype.h
+1457246439 c:\users\chris\desktop\github\ce101-final-project\imgui\stb_truetype.h
 	"stb_truetype.h"
 	<stdio.h>
 	"stb_truetype.h"
