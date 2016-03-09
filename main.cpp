@@ -40,6 +40,8 @@ SDL_Texture* outTexture = NULL;
 SDL_Rect origPic; //maybe make global?
 SDL_Rect aaPic;
 
+SDL_Rect view;
+
 
 int mainWindowID;
 int inWindowID;
@@ -112,23 +114,23 @@ void render(SDL_Renderer* renderer, SDL_Texture* intexture, SDL_Texture* outtext
 		SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
 		SDL_RenderClear( renderer );
 		//Update screen
-		SDL_RenderCopy( renderer, intexture, NULL, &origPic);
-		SDL_RenderCopy( renderer, outtexture, NULL, &aaPic);
+		SDL_RenderCopy( renderer, intexture, &view, &origPic);
+		SDL_RenderCopy( renderer, outtexture, &view, &aaPic);
 		SDL_RenderPresent( renderer );
 }
 
 void loadWindow(SDL_Surface* insurface, SDL_Surface* outsurface, int surfaceWidth, int surfaceHeight) {
     //Setup original picture and anti-aliased picture
 //    SDL_Rect origPic; //maybe make global?
-    origPic.w = surfaceWidth;
-    origPic.h = surfaceHeight;
+    origPic.w = 500;
+    origPic.h = 500;
     origPic.x = 0;
     origPic.y = 0;
 
 //    SDL_Rect aaPic; //maybe make global?
-    aaPic.w = surfaceWidth;
-    aaPic.h = surfaceHeight;
-    aaPic.x = surfaceWidth;
+    aaPic.w = 500;
+    aaPic.h = 500;
+    aaPic.x = 500;
     aaPic.y = 0;
 
     inWindow = SDL_CreateWindow(
@@ -197,17 +199,24 @@ int main( int argc, char* args[] )
         ImVec4 bgColor = ImColor(114,144,154);
         bool showmainWindow = true;
 
+        // Set up image viewport stuff
+        view.w = 500;
+        view.h = 500;
+        view.x = 0;
+        view.y = 0;
+
 		//Main loop flag
 		bool quit = false;
 
 		//Event handler
 		SDL_Event e;
+        bool dragging = false;
 
 		//While application is running
 		while( !quit )
 		{
 			//Handle events on queue
-			while( SDL_PollEvent( &e ) > 0)
+			while( SDL_PollEvent( &e ))
 			{
 			    handleEvent(e, mainWindow, mainWindowID);
 			    handleEvent(e, inWindow, inWindowID);
@@ -218,10 +227,42 @@ int main( int argc, char* args[] )
 				{
 					quit = true;
 				}
+
+				if ( e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == inWindowID )
+                {
+                    dragging = true;
+                }
+
+                if ( e.type == SDL_MOUSEBUTTONUP && e.window.windowID == inWindowID )
+                {
+                    dragging = false;
+                }
+
+                if ( dragging )
+                {
+                    if (e.motion.xrel < 250 || e.motion.yrel < 250)
+                    {
+                        view.x -= e.motion.xrel;
+                        view.y -= e.motion.yrel;
+                        if (view.x < 0) view.x = 0;
+                        if (view.x > inSurface->w - 500) view.x = inSurface->w - 500;
+                        if (view.y < 0) view.y = 0;
+                        if (view.y > inSurface->h - 500) view.y = inSurface->h - 500;
+
+                    }
+                    render(inRenderer, inTexture, outTexture);
+                }
+			}
+
+
+
+
+
+
         ImGui_ImplSdl_NewFrame(mainWindow);
 
         // Main UI
-        {
+
             static float bg_alpha = -0.01f;
             static int i = 0;
             ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
@@ -239,7 +280,7 @@ int main( int argc, char* args[] )
                     inScreenW = inSurface->w;
                     inScreenH = inSurface->h;
 
-                    loadWindow(inSurface, NULL, inScreenW, inScreenH);
+                    loadWindow(inSurface, outSurface, inScreenW, inScreenH);
                     inWindowID = SDL_GetWindowID( inWindow );
                                  // Add loading function here
                 }
@@ -251,13 +292,17 @@ int main( int argc, char* args[] )
                 //TODO: Add loading image here
                 // POSSIBILITY OF ERROR
                 outSurface = SDL_LoadBMP(tfdOpen);
-                SDL_DestroyWindow(inWindow);
+                /*SDL_DestroyWindow(inWindow);
                 inWindow = NULL;
                 loadWindow(inSurface, outSurface, inScreenW, inScreenH);
-                inWindowID = SDL_GetWindowID( inWindow );
+                inWindowID = SDL_GetWindowID( inWindow );*/
+                outTexture = SDL_CreateTextureFromSurface(inRenderer, outSurface);
+                render(inRenderer, inTexture, outTexture);
+
             }
             ImGui::End();
-        }
+
+
         // Render imgui to window
         glViewport(0,0,(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
         glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.w);
@@ -267,7 +312,7 @@ int main( int argc, char* args[] )
 			}
 		}
 
-	}
+
 
 	//Free resources and close SDL
 	close();
