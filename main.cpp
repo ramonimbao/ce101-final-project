@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include <sstream>
-
+#include <vector>
 // For imgui
 #include <SDL2/SDL_opengl.h>
 #include "imgui.h"
@@ -42,6 +42,8 @@ SDL_Rect aaPic;
 
 SDL_Rect view;
 
+std::vector<std::vector<Uint32> > colorsOriginal; //array containing pixel values of original image
+std::vector<std::vector<Uint32> > colorsNewImage; //array containing pixel values of anti-aliased image
 
 int mainWindowID;
 int inWindowID;
@@ -240,7 +242,7 @@ int main( int argc, char* args[] )
 
                 if ( dragging )
                 {
-                    if (e.motion.xrel < 250 || e.motion.yrel < 250)
+                    if (e.motion.xrel < 50 || e.motion.yrel < 50)
                     {
                         view.x -= e.motion.xrel;
                         view.y -= e.motion.yrel;
@@ -283,6 +285,62 @@ int main( int argc, char* args[] )
                     loadWindow(inSurface, outSurface, inScreenW, inScreenH);
                     inWindowID = SDL_GetWindowID( inWindow );
                                  // Add loading function here
+                    colorsOriginal.clear();
+
+
+
+                    colorsOriginal = std::vector<std::vector<Uint32> >( inScreenH, std::vector<Uint32>(inScreenW, 0) );
+
+                    SDL_PixelFormat *fmt;
+                    Uint32 temp, pixel;
+                    Uint8 red, green, blue;
+
+                    fmt = inSurface->format;
+
+                    int bpp = inSurface->format->BytesPerPixel;
+
+
+                    for(int y=0; y<inScreenH; y++) {
+                        for (int x=0; x<inScreenW; x++) {
+                            SDL_LockSurface(inSurface);
+                            pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x *bpp));
+                            //pixel = *((Uint32*) (inSurface->pixels + (y * inScreenH + x)));
+                            SDL_UnlockSurface(inSurface);
+
+                            temp = pixel & fmt->Rmask;
+                            temp = temp >> fmt->Rshift;
+                            temp = temp << fmt->Rloss;
+                            red = (Uint8) temp;
+
+                            temp = pixel & fmt->Gmask;
+                            temp = temp >> fmt->Gshift;
+                            temp = temp << fmt->Gloss;
+                            green = (Uint8) temp;
+
+                            temp = pixel & fmt->Bmask;
+                            temp = temp >> fmt->Bshift;
+                            temp = temp << fmt->Bloss;
+                            blue = (Uint8) temp;
+
+                            printf("(%d, %d, %d)\n",red,green,blue);
+                        }
+                    }
+
+
+
+                    /*for(Uint32 y=0; y<inScreenH; y++){
+                        for(Uint32 x=0; x<inScreenW; x++){
+
+
+
+                            //colorsOriginal[y][x] = (Uint32)pixels + (sizeof(Uint32) * (y * inScreenW + x));
+                            Uint8 r, g, b;
+                            SDL_GetRGB(colorsOriginal[y][x], SDL_GetWindowSurface(inWindow)->format, &r, &g, &b);
+                            //printf("(%i, %i, %i)\n", r, g, b);
+                        }
+                    }*/
+
+                    //SDL_UnlockTexture(inTexture);
                 }
             }
             ImGui::Text("Anti-aliasing Factor");
