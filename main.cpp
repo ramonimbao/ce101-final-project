@@ -124,14 +124,16 @@ void render(SDL_Renderer* renderer, SDL_Texture* intexture, SDL_Texture* outtext
 void loadWindow(SDL_Surface* insurface, SDL_Surface* outsurface, int surfaceWidth, int surfaceHeight) {
     //Setup original picture and anti-aliased picture
 //    SDL_Rect origPic; //maybe make global?
-    origPic.w = 500;
-    origPic.h = 500;
+    if (surfaceWidth >= 500) origPic.w = 500;
+    else origPic.w = surfaceWidth;
+    if (surfaceHeight >= 500) origPic.h = 500;
+    else origPic.h = surfaceHeight;
     origPic.x = 0;
     origPic.y = 0;
 
 //    SDL_Rect aaPic; //maybe make global?
-    aaPic.w = 500;
-    aaPic.h = 500;
+    aaPic.w = origPic.w;
+    aaPic.h = origPic.h;
     aaPic.x = 500;
     aaPic.y = 0;
 
@@ -282,13 +284,12 @@ int main( int argc, char* args[] )
                     inScreenW = inSurface->w;
                     inScreenH = inSurface->h;
 
+                    SDL_DestroyWindow(inWindow);
                     loadWindow(inSurface, outSurface, inScreenW, inScreenH);
                     inWindowID = SDL_GetWindowID( inWindow );
+
                                  // Add loading function here
                     colorsOriginal.clear();
-
-
-
                     colorsOriginal = std::vector<std::vector<Uint32> >( inScreenH, std::vector<Uint32>(inScreenW, 0) );
 
                     SDL_PixelFormat *fmt;
@@ -299,14 +300,14 @@ int main( int argc, char* args[] )
 
                     int bpp = inSurface->format->BytesPerPixel;
 
-
+                    SDL_LockSurface(inSurface);
                     for(int y=0; y<inScreenH; y++) {
                         for (int x=0; x<inScreenW; x++) {
-                            SDL_LockSurface(inSurface);
-                            pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x *bpp));
-                            //pixel = *((Uint32*) (inSurface->pixels + (y * inScreenH + x)));
-                            SDL_UnlockSurface(inSurface);
 
+                            pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x *bpp));
+
+                            /*
+                            // Grab pixel colors
                             temp = pixel & fmt->Rmask;
                             temp = temp >> fmt->Rshift;
                             temp = temp << fmt->Rloss;
@@ -322,25 +323,12 @@ int main( int argc, char* args[] )
                             temp = temp << fmt->Bloss;
                             blue = (Uint8) temp;
 
-                            printf("(%d, %d, %d)\n",red,green,blue);
+                            printf("(%d, %d, %d)\n",red,green,blue);*/
                         }
                     }
+                    SDL_UnlockSurface(inSurface);
 
-
-
-                    /*for(Uint32 y=0; y<inScreenH; y++){
-                        for(Uint32 x=0; x<inScreenW; x++){
-
-
-
-                            //colorsOriginal[y][x] = (Uint32)pixels + (sizeof(Uint32) * (y * inScreenW + x));
-                            Uint8 r, g, b;
-                            SDL_GetRGB(colorsOriginal[y][x], SDL_GetWindowSurface(inWindow)->format, &r, &g, &b);
-                            //printf("(%i, %i, %i)\n", r, g, b);
-                        }
-                    }*/
-
-                    //SDL_UnlockTexture(inTexture);
+                    render(inRenderer, inTexture, outTexture);
                 }
             }
             ImGui::Text("Anti-aliasing Factor");
@@ -350,10 +338,6 @@ int main( int argc, char* args[] )
                 //TODO: Add loading image here
                 // POSSIBILITY OF ERROR
                 outSurface = SDL_LoadBMP(tfdOpen);
-                /*SDL_DestroyWindow(inWindow);
-                inWindow = NULL;
-                loadWindow(inSurface, outSurface, inScreenW, inScreenH);
-                inWindowID = SDL_GetWindowID( inWindow );*/
                 outTexture = SDL_CreateTextureFromSurface(inRenderer, outSurface);
                 render(inRenderer, inTexture, outTexture);
 
