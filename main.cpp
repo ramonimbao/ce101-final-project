@@ -306,6 +306,8 @@ int main( int argc, char* args[] )
 
                             pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x *bpp));
 
+                            colorsOriginal[y][x] = pixel;
+
                             /*
                             // Grab pixel colors
                             temp = pixel & fmt->Rmask;
