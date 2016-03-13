@@ -51,6 +51,8 @@ int inWindowID;
 int inScreenW;
 int inScreenH;
 
+bool quit;
+
 void close()
 {
 	//Destroy windows
@@ -210,7 +212,7 @@ int main( int argc, char* args[] )
         view.y = 0;
 
 		//Main loop flag
-		bool quit = false;
+		quit = false;
 
 		//Event handler
 		SDL_Event e;
@@ -278,9 +280,11 @@ int main( int argc, char* args[] )
                 printf("%s\n",tfdOpen);
 
                 inSurface = SDL_LoadBMP(tfdOpen);
+
                 if (inSurface == NULL) {
                         printf("Unable to load image %s! Error: %s\n", tfdOpen, SDL_GetError());
                 } else {
+                    inSurface = SDL_ConvertSurfaceFormat(inSurface, SDL_PIXELFORMAT_ABGR8888, NULL); // convert to 32 bits
                     inScreenW = inSurface->w;
                     inScreenH = inSurface->h;
 
@@ -308,7 +312,7 @@ int main( int argc, char* args[] )
 
                             colorsOriginal[y][x] = pixel;
 
-                            /*
+
                             // Grab pixel colors
                             temp = pixel & fmt->Rmask;
                             temp = temp >> fmt->Rshift;
@@ -325,7 +329,7 @@ int main( int argc, char* args[] )
                             temp = temp << fmt->Bloss;
                             blue = (Uint8) temp;
 
-                            printf("(%d, %d, %d)\n",red,green,blue);*/
+                            //printf("(%d, %d, %d)\n",red,green,blue);
                         }
                     }
                     SDL_UnlockSurface(inSurface);
@@ -339,7 +343,65 @@ int main( int argc, char* args[] )
             // THIS IS WHERE THE APPLY BUTTON HAPPENS
                 //TODO: Add loading image here
                 // POSSIBILITY OF ERROR
-                outSurface = SDL_LoadBMP(tfdOpen);
+
+                //outSurface = SDL_CreateRGBSurfaceFrom(inSurface->pixels, inSurface->w, inSurface->h, 32, inSurface->pitch, inSurface->format->Rmask, inSurface->format->Gmask, inSurface->format->Bmask, inSurface->format->Amask);
+                Uint32 rmask, gmask, bmask, amask;
+                #if SDL_BYTEORDER == SDL_BIG_ENDIAN
+                rmask = 0xff000000;
+                gmask = 0x00ff0000;
+                bmask = 0x0000ff00;
+                amask = 0x000000ff;
+                #else
+                rmask = 0x000000ff;
+                gmask = 0x0000ff00;
+                bmask = 0x00ff0000;
+                amask = 0xff000000;
+                #endif
+                outSurface = SDL_CreateRGBSurface(NULL, inSurface->w, inSurface->h, 32, rmask, gmask, bmask, amask);
+
+                std::cout << "Starting...";
+                    SDL_PixelFormat *fmt;
+                    Uint32 temp, pixel;
+                    Uint8 red, green, blue;
+                    int outScreenW = outSurface->w;
+                    int outScreenH = outSurface->h;
+                    fmt = outSurface->format;
+                    int bpp = outSurface->format->BytesPerPixel;
+
+
+                    SDL_LockSurface(outSurface);
+                    for(unsigned int y=0; y<inScreenH; y++) {
+                        for (unsigned int x=0; x<inScreenW; x++) {
+                            //pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x * inSurface->format->BytesPerPixel));
+                            pixel = colorsOriginal[y][x];
+
+                            // Grab pixel colors
+                            temp = pixel & fmt->Rmask;
+                            temp = temp >> fmt->Rshift;
+                            temp = temp << fmt->Rloss;
+                            red = (Uint8) temp;
+
+                            temp = pixel & fmt->Gmask;
+                            temp = temp >> fmt->Gshift;
+                            temp = temp << fmt->Gloss;
+                            green = (Uint8) temp;
+
+                            temp = pixel & fmt->Bmask;
+                            temp = temp >> fmt->Bshift;
+                            temp = temp << fmt->Bloss;
+                            blue = (Uint8) temp;
+
+                            Uint32* curPixel = (Uint32*)outSurface->pixels;
+                            Uint32* p = curPixel + y*outSurface->pitch/4 + x;
+                            *p = SDL_MapRGB(fmt, 255-red, 255-green, 255-blue);
+                        }
+                    }
+                    SDL_UnlockSurface(outSurface);
+
+
+
+                    std::cout << " ...done!\n";
+
                 outTexture = SDL_CreateTextureFromSurface(inRenderer, outSurface);
                 render(inRenderer, inTexture, outTexture);
 
