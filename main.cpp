@@ -43,7 +43,9 @@ SDL_Rect aaPic;
 SDL_Rect view;
 
 std::vector<std::vector<Uint32> > colorsOriginal; //array containing pixel values of original image
-std::vector<std::vector<Uint32> > colorsNewImage; //array containing pixel values of anti-aliased image
+std::vector<std::vector<Uint32> > colorsScaledImage; //array containing pixel values of scaled image
+std::vector<std::vector<Uint32> > colorsScaledSampledImage; // array containing pixel values of anti-aliased image
+std::vector<std::vector<Uint32> > colorsFinalImage; //array containing pixel values of final original-sized image
 
 int mainWindowID;
 int inWindowID;
@@ -130,21 +132,21 @@ void loadWindow(SDL_Surface* insurface, SDL_Surface* outsurface, int surfaceWidt
     else origPic.w = surfaceWidth;
     if (surfaceHeight >= 500) origPic.h = 500;
     else origPic.h = surfaceHeight;
-    origPic.x = 0;
-    origPic.y = 0;
+    origPic.x = 50;
+    origPic.y = 50;
 
 //    SDL_Rect aaPic; //maybe make global?
     aaPic.w = origPic.w;
     aaPic.h = origPic.h;
-    aaPic.x = 500;
-    aaPic.y = 0;
+    aaPic.x = 600;
+    aaPic.y = 50;
 
     inWindow = SDL_CreateWindow(
         "Supersampling Anti-aliasing",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        1000,
-        500,
+        1150,
+        600,
         SDL_WINDOW_SHOWN);
 
     inRenderer = SDL_CreateRenderer(inWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -154,6 +156,24 @@ void loadWindow(SDL_Surface* insurface, SDL_Surface* outsurface, int surfaceWidt
 
     render(inRenderer, inTexture, outTexture);
 
+}
+
+void getRGBValues(SDL_PixelFormat* fmt, Uint32 pixel, Uint8* red, Uint8* green, Uint8* blue) {
+    Uint32 temp;
+    temp = pixel & fmt->Rmask;
+    temp = temp >> fmt->Rshift;
+    temp = temp << fmt->Rloss;
+    *red = (Uint8) temp;
+
+    temp = pixel & fmt->Gmask;
+    temp = temp >> fmt->Gshift;
+    temp = temp << fmt->Gloss;
+    *green = (Uint8) temp;
+
+    temp = pixel & fmt->Bmask;
+    temp = temp >> fmt->Bshift;
+    temp = temp << fmt->Bloss;
+    *blue = (Uint8) temp;
 }
 
 int main( int argc, char* args[] )
@@ -270,7 +290,7 @@ int main( int argc, char* args[] )
         // Main UI
 
             static float bg_alpha = -0.01f;
-            static int i = 0;
+            static int factor = 2;
             ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
 
             ImGui::Begin("Supersampling Anti-aliasing", &showmainWindow, ImVec2(294,112), bg_alpha, window_flags);
@@ -311,8 +331,7 @@ int main( int argc, char* args[] )
                             pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x *bpp));
 
                             colorsOriginal[y][x] = pixel;
-
-
+                            /*
                             // Grab pixel colors
                             temp = pixel & fmt->Rmask;
                             temp = temp >> fmt->Rshift;
@@ -330,6 +349,7 @@ int main( int argc, char* args[] )
                             blue = (Uint8) temp;
 
                             //printf("(%d, %d, %d)\n",red,green,blue);
+                            */
                         }
                     }
                     SDL_UnlockSurface(inSurface);
@@ -338,7 +358,7 @@ int main( int argc, char* args[] )
                 }
             }
             ImGui::Text("Anti-aliasing Factor");
-            ImGui::SliderInt("", &i, 0, 10);
+            ImGui::SliderInt("", &factor, 2, 8);
             if (ImGui::Button("Apply")) {
             // THIS IS WHERE THE APPLY BUTTON HAPPENS
                 //TODO: Add loading image here
@@ -368,32 +388,201 @@ int main( int argc, char* args[] )
                     fmt = outSurface->format;
                     int bpp = outSurface->format->BytesPerPixel;
 
+                    std::cout << "\nScaling...";
+                    colorsScaledImage.clear();
+                    colorsScaledImage = std::vector<std::vector<Uint32> >( inScreenH*factor, std::vector<Uint32>(inScreenW*factor, 0) );
+
+                    // copy all the colors to the bigger array, making copies
+                    for (unsigned int y=0; y<inScreenH*factor; y++){
+                        for (unsigned int x=0; x<inScreenW*factor; x++){
+                            colorsScaledImage[y][x] = colorsOriginal[y/factor][x/factor];
+                        }
+                    }
+
+                    std::cout << "\nSampling...";
+                    colorsScaledSampledImage.clear();
+                    colorsScaledSampledImage = std::vector<std::vector<Uint32> >( inScreenH*factor, std::vector<Uint32>(inScreenW*factor, 0) );
+                    for (unsigned int y=0; y < inScreenH * factor; y++) {
+                        for (unsigned int x=0; x<inScreenW*factor; x++) {
+                            // TOP-LEFT CORNER
+                            if (x == 0 && y == 0) {
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=0; _y<1; _y++) {
+                                    for (int _x=0; _x<1; _x++) {
+                                        getRGBValues(fmt, colorsScaledImage[_y][_x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+                            }
+                            // TOP EDGE (NOT CORNERS)
+                            else if (y == 0 && (x >= 1 && x <= inScreenW*factor - 2)) {
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=0; _y<1; _y++) {
+                                    for (int _x=-1; _x<1; _x++) {
+                                        getRGBValues(fmt, colorsScaledImage[_y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+                            }
+
+                            // TOP RIGHT CORNER
+                            else if(y == 0 && x == inScreenW*factor - 1){
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=0; _y<1; _y++){
+                                    for (int _x=-1; _x<0; _x++){
+                                        getRGBValues(fmt, colorsScaledImage[_y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+                            }
+                            //LEFT MOST EDGE
+                            else if (x == 0 && ( y >= 1 && y <= inScreenH*factor - 2)){
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=-1; _y<1; _y++){
+                                    for (int _x=0; _x<1; _x++){
+                                       getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+                            }
+                            //BOTTOM LEFT CORNER
+                            else if(x == 0 && y == inScreenH*factor - 1){
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=-1; _y<0; _y++){
+                                    for (int _x=0; _x<1; _x++){
+                                        getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+                            }
+                            //BOTTOM MOST EDGES
+                            else if(y == inScreenH * factor -1 && (x >= 1 && x <= inScreenW*factor - 2)){
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=-1; _y<0; _y++){
+                                    for (int _x=-1; _x<1; _x++){
+                                        getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+                            }
+                            //BOTTOM RIGHT CORNER
+                            else if(y == inScreenH * factor -1 && x == inScreenW * factor -1){
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=-1; _y<0; _y++){
+                                    for (int _x=-1; _x<0; _x++){
+                                        getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+                            }
+                            //RIGHT MOST EDGE
+                            else if(x == inScreenW * factor -1 && (y >= 1 && y <= inScreenH *factor -2)){
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for(int _y=-1; _y<1; _y++){
+                                    for (int _x=-1; _x<0; _x++){
+                                        getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+                            }
+                            else{
+                                Uint32 rSum = 0;
+                                Uint32 gSum = 0;
+                                Uint32 bSum = 0;
+                                Uint8 r, g, b;
+                                for (int _y=-1; _y<1; _y++){
+                                    for (int _x=-1; _x<1; _x++){
+                                        getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
+                                        rSum += r;
+                                        gSum += g;
+                                        bSum += b;
+                                    }
+                                }
+                                colorsScaledSampledImage[y][x] = SDL_MapRGB(fmt, rSum/9, gSum/9, bSum/9);
+                            }
+                        }
+                    }
+
+                    std::cout << "\nDownsampling...";
+                    colorsFinalImage.clear();
+                    colorsFinalImage = std::vector<std::vector<Uint32> >( inScreenH, std::vector<Uint32>(inScreenW, 0) );
+                    for (unsigned int y=0; y<inScreenH; y++) {
+                        for (unsigned int x=0; x<inScreenW; x++) {
+                            Uint32 rSum = 0;
+                            Uint32 gSum = 0;
+                            Uint32 bSum = 0;
+                            Uint8 r, g, b;
+                            for(int _y=0; _y<factor; _y++) {
+                                for(int _x=0; _x<factor; _x++) {
+                                    getRGBValues(fmt, colorsScaledSampledImage[_y+y*factor][_x+x*factor], &r, &g, &b);
+                                    rSum += r;
+                                    gSum += g;
+                                    bSum += b;
+                                }
+                            }
+                            int factor2 = factor * factor;
+                            colorsFinalImage[y][x] = SDL_MapRGB(fmt, rSum/factor, gSum/factor, bSum/factor);
+                        }
+                    }
 
                     SDL_LockSurface(outSurface);
                     for(unsigned int y=0; y<inScreenH; y++) {
                         for (unsigned int x=0; x<inScreenW; x++) {
-                            //pixel = *((Uint32*) (inSurface->pixels + y*inSurface->pitch + x * inSurface->format->BytesPerPixel));
-                            pixel = colorsOriginal[y][x];
-
-                            // Grab pixel colors
-                            temp = pixel & fmt->Rmask;
-                            temp = temp >> fmt->Rshift;
-                            temp = temp << fmt->Rloss;
-                            red = (Uint8) temp;
-
-                            temp = pixel & fmt->Gmask;
-                            temp = temp >> fmt->Gshift;
-                            temp = temp << fmt->Gloss;
-                            green = (Uint8) temp;
-
-                            temp = pixel & fmt->Bmask;
-                            temp = temp >> fmt->Bshift;
-                            temp = temp << fmt->Bloss;
-                            blue = (Uint8) temp;
+                            pixel = colorsFinalImage[y][x];
 
                             Uint32* curPixel = (Uint32*)outSurface->pixels;
                             Uint32* p = curPixel + y*outSurface->pitch/4 + x;
-                            *p = SDL_MapRGB(fmt, 255-red, 255-green, 255-blue);
+                            *p = pixel;
                         }
                     }
                     SDL_UnlockSurface(outSurface);
