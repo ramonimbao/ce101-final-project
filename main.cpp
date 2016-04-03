@@ -33,9 +33,11 @@ SDL_Renderer* inRenderer = NULL;
 
 SDL_Surface* inSurface = NULL;
 SDL_Surface* outSurface = NULL;
+SDL_Surface* bgSurface = NULL;
 
 SDL_Texture* inTexture = NULL;
 SDL_Texture* outTexture = NULL;
+SDL_Texture* bgTexture = NULL;
 
 SDL_Rect origPic; //maybe make global?
 SDL_Rect aaPic;
@@ -120,6 +122,7 @@ void render(SDL_Renderer* renderer, SDL_Texture* intexture, SDL_Texture* outtext
 		SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
 		SDL_RenderClear( renderer );
 		//Update screen
+		SDL_RenderCopy( renderer, bgTexture, NULL, NULL );
 		SDL_RenderCopy( renderer, intexture, &view, &origPic);
 		SDL_RenderCopy( renderer, outtexture, &view, &aaPic);
 		SDL_RenderPresent( renderer );
@@ -153,6 +156,7 @@ void loadWindow(SDL_Surface* insurface, SDL_Surface* outsurface, int surfaceWidt
 
     inTexture = SDL_CreateTextureFromSurface(inRenderer, insurface);
     outTexture = SDL_CreateTextureFromSurface(inRenderer, outsurface);
+    bgTexture = SDL_CreateTextureFromSurface(inRenderer, bgSurface);
 
     render(inRenderer, inTexture, outTexture);
 
@@ -237,6 +241,10 @@ int main( int argc, char* args[] )
 		//Event handler
 		SDL_Event e;
         bool dragging = false;
+
+        // Background loading
+        bgSurface = SDL_LoadBMP("bg.bmp");
+
 
 		//While application is running
 		while( !quit )
@@ -410,8 +418,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=0; _y<1; _y++) {
-                                    for (int _x=0; _x<1; _x++) {
+                                for (int _y=0; _y<=1; _y++) {
+                                    for (int _x=0; _x<=1; _x++) {
                                         getRGBValues(fmt, colorsScaledImage[_y][_x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -427,8 +435,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=0; _y<1; _y++) {
-                                    for (int _x=-1; _x<1; _x++) {
+                                for (int _y=0; _y<=1; _y++) {
+                                    for (int _x=-1; _x<=1; _x++) {
                                         getRGBValues(fmt, colorsScaledImage[_y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -445,8 +453,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=0; _y<1; _y++){
-                                    for (int _x=-1; _x<0; _x++){
+                                for (int _y=0; _y<=1; _y++){
+                                    for (int _x=-1; _x<=0; _x++){
                                         getRGBValues(fmt, colorsScaledImage[_y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -461,8 +469,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=-1; _y<1; _y++){
-                                    for (int _x=0; _x<1; _x++){
+                                for (int _y=-1; _y<=1; _y++){
+                                    for (int _x=0; _x<=1; _x++){
                                        getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -477,8 +485,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=-1; _y<0; _y++){
-                                    for (int _x=0; _x<1; _x++){
+                                for (int _y=-1; _y<=0; _y++){
+                                    for (int _x=0; _x<=1; _x++){
                                         getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -493,8 +501,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=-1; _y<0; _y++){
-                                    for (int _x=-1; _x<1; _x++){
+                                for (int _y=-1; _y<=0; _y++){
+                                    for (int _x=-1; _x<=1; _x++){
                                         getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -509,8 +517,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=-1; _y<0; _y++){
-                                    for (int _x=-1; _x<0; _x++){
+                                for (int _y=-1; _y<=0; _y++){
+                                    for (int _x=-1; _x<=0; _x++){
                                         getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -525,8 +533,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for(int _y=-1; _y<1; _y++){
-                                    for (int _x=-1; _x<0; _x++){
+                                for(int _y=-1; _y<=1; _y++){
+                                    for (int _x=-1; _x<=0; _x++){
                                         getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -540,8 +548,8 @@ int main( int argc, char* args[] )
                                 Uint32 gSum = 0;
                                 Uint32 bSum = 0;
                                 Uint8 r, g, b;
-                                for (int _y=-1; _y<1; _y++){
-                                    for (int _x=-1; _x<1; _x++){
+                                for (int _y=-1; _y<=1; _y++){
+                                    for (int _x=-1; _x<=1; _x++){
                                         getRGBValues(fmt, colorsScaledImage[_y+y][_x+x], &r, &g, &b);
                                         rSum += r;
                                         gSum += g;
@@ -571,7 +579,7 @@ int main( int argc, char* args[] )
                                 }
                             }
                             int factor2 = factor * factor;
-                            colorsFinalImage[y][x] = SDL_MapRGB(fmt, rSum/factor, gSum/factor, bSum/factor);
+                            colorsFinalImage[y][x] = SDL_MapRGB(fmt, rSum/factor2, gSum/factor2, bSum/factor2);
                         }
                     }
 
