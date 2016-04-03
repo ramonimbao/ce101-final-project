@@ -17,7 +17,7 @@
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 300;
-const int SCREEN_HEIGHT = 120;
+const int SCREEN_HEIGHT = 150;
 
 //Total windows
 const int TOTAL_WINDOWS = 3;
@@ -183,6 +183,7 @@ void getRGBValues(SDL_PixelFormat* fmt, Uint32 pixel, Uint8* red, Uint8* green, 
 int main( int argc, char* args[] )
 {
     char const * tfdOpen;
+    char const * tfdSave;
     SDL_GLContext glContext;
 
 	//Initialize SDL
@@ -301,7 +302,7 @@ int main( int argc, char* args[] )
             static int factor = 2;
             ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
 
-            ImGui::Begin("Supersampling Anti-aliasing", &showmainWindow, ImVec2(294,112), bg_alpha, window_flags);
+            ImGui::Begin("Supersampling Anti-aliasing", &showmainWindow, ImVec2(294,140), bg_alpha, window_flags);
             if (ImGui::Button("Load Image")) {
             // THIS IS WHERE THE LOAD IMAGE BUTTON HAPPENS
                 tfdOpen = tinyfd_openFileDialog("Load Image File", "", 0,NULL, NULL, 0);
@@ -603,6 +604,19 @@ int main( int argc, char* args[] )
                 render(inRenderer, inTexture, outTexture);
 
             }
+            if (ImGui::Button("Save Image")) {
+                tfdSave = tinyfd_saveFileDialog("Save Image File","Antialiased.bmp",0 , NULL, NULL
+                );
+                printf("%s\n",tfdSave);
+
+                if (outSurface == NULL) {
+                        printf("Unable to save image %s! Error: %s\n", tfdSave, SDL_GetError());
+                } else {
+                    SDL_SaveBMP(outSurface, tfdSave);
+                }
+
+            }
+
             ImGui::End();
 
 
