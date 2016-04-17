@@ -748,15 +748,15 @@ int main( int argc, char* args[] )
   }
 
 
-    //
-	//Free resources and close SDL
-	close();
-	ImGui_ImplSdl_Shutdown();
+//
+//Free resources and close SDL
+  close();
+  ImGui_ImplSdl_Shutdown();
   SDL_GL_DeleteContext(glContext);
   SDL_DestroyWindow(mainWindow);
-	SDL_Quit();
+  SDL_Quit();
 
-	return 0;
+  return 0;
 }
 
 #pragma warning(default:4996)
