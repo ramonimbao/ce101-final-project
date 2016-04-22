@@ -531,8 +531,8 @@ void applyAntialiasing(
 
 int main( int argc, char* args[] )
 {
-  char const * tfdOpen;
-   char const * tfdSave;
+  char const * tfdOpen = NULL;
+   char const * tfdSave = NULL;
    SDL_GLContext glContext;
 
 	//Initialize SDL
@@ -670,30 +670,31 @@ int main( int argc, char* args[] )
                                         0);
         printf("%s\n",tfdOpen);
 
-        inSurface = SDL_LoadBMP(tfdOpen);
-
-        if (inSurface == NULL)
+        if ((tfdOpen == NULL))
         {
-          printf("Unable to load image %s! Error: %s\n",
-                 tfdOpen,
-                 SDL_GetError());
-        }
-        else
+            // do nothing
+        } else
         {
-          inSurface =
-            SDL_ConvertSurfaceFormat(inSurface,
-                                     SDL_PIXELFORMAT_ABGR8888,
-                                     NULL); // convert to 32 bits
-          inScreenW = inSurface->w;
-          inScreenH = inSurface->h;
-
-          SDL_DestroyWindow(inWindow);
-          loadWindow(inSurface, outSurface, inScreenW, inScreenH);
-          inWindowID = SDL_GetWindowID( inWindow );
-
-          // Add loading function here
-
-          render(inRenderer, inTexture, outTexture);
+           inSurface = SDL_LoadBMP(tfdOpen);
+           if (inSurface == NULL)
+            {
+                printf("Unable to load image %s! Error: %s\n",
+                tfdOpen,
+                SDL_GetError());
+            }
+           else
+            {
+                inSurface =
+                SDL_ConvertSurfaceFormat(inSurface,
+                                         SDL_PIXELFORMAT_ABGR8888,
+                                         NULL); // convert to 32 bits
+                inScreenW = inSurface->w;
+                inScreenH = inSurface->h;
+                SDL_DestroyWindow(inWindow);
+                loadWindow(inSurface, outSurface, inScreenW, inScreenH);
+                inWindowID = SDL_GetWindowID( inWindow );
+                render(inRenderer, inTexture, outTexture);
+            }
         }
       }
       ImGui::Text("Anti-aliasing Factor");
