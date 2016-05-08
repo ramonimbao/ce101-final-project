@@ -282,8 +282,16 @@ void applyAntialiasing(
       bSum += b;
     }
   }
+
+  for(int i=0; i<3; i++) {
+    getRGBValues(fmt, colorsScaledImage[0][0], &r, &g, &b);
+    rSum += r;
+    gSum += g;
+    bSum += b;
+  }
+
   colorsScaledSampledImage[0][0] =
-    SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+    SDL_MapRGB(fmt, rSum/7, gSum/7, bSum/7);
 
   // TOP EDGES
   for(int x = 1; x <= inScreenW*factor - 2; x++)
@@ -305,8 +313,16 @@ void applyAntialiasing(
         bSum += b;
       }
     }
+
+    for(int i=0; i<3; i++) {
+        getRGBValues(fmt, colorsScaledImage[0][x], &r, &g, &b);
+        rSum += r;
+        gSum += g;
+        bSum += b;
+    }
+
     colorsScaledSampledImage[0][x] =
-      SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+      SDL_MapRGB(fmt, rSum/9, gSum/9, bSum/9);
   }
 
   // TOP RIGHT CORNER
@@ -327,8 +343,16 @@ void applyAntialiasing(
       bSum += b;
     }
   }
+
+  for(int i=0; i<3; i++) {
+    getRGBValues(fmt, colorsScaledImage[0][inScreenW*factor-1], &r, &g, &b);
+    rSum += r;
+    gSum += g;
+    bSum += b;
+  }
+
   colorsScaledSampledImage[0][inScreenW*factor-1] =
-    SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+    SDL_MapRGB(fmt, rSum/7, gSum/7, bSum/7);
 
   // LEFT EDGES
   for(int y=1; y <= inScreenH * factor - 2; y++)
@@ -350,8 +374,16 @@ void applyAntialiasing(
         bSum += b;
       }
     }
+
+    for(int i=0; i<3; i++) {
+        getRGBValues(fmt, colorsScaledImage[y][0], &r, &g, &b);
+        rSum += r;
+        gSum += g;
+        bSum += b;
+    }
+
     colorsScaledSampledImage[y][0] =
-      SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+      SDL_MapRGB(fmt, rSum/9, gSum/9, bSum/9);
   }
 
   // BOTTOM LEFT CORNER
@@ -372,8 +404,16 @@ void applyAntialiasing(
       bSum += b;
     }
   }
+
+  for(int i=0; i<3; i++) {
+    getRGBValues(fmt, colorsScaledImage[inScreenH*factor-1][0], &r, &g, &b);
+    rSum += r;
+    gSum += g;
+    bSum += b;
+  }
+
   colorsScaledSampledImage[inScreenH*factor-1][0] =
-    SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+    SDL_MapRGB(fmt, rSum/7, gSum/7, bSum/7);
 
   // BOTTOM EDGES
   for(int x = 1; x <= inScreenW*factor-2; x++)
@@ -395,8 +435,15 @@ void applyAntialiasing(
         bSum += b;
       }
     }
+
+    for (int i=0; i<3; i++) {
+        getRGBValues(fmt, colorsScaledImage[inScreenH*factor-1][x], &r, &g, &b);
+        rSum += r;
+        gSum += g;
+        bSum += b;
+    }
     colorsScaledSampledImage[inScreenH*factor-1][x] =
-      SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+      SDL_MapRGB(fmt, rSum/9, gSum/9, bSum/9);
   }
 
   // BOTTOM RIGHT CORNER
@@ -417,8 +464,16 @@ void applyAntialiasing(
       bSum += b;
     }
   }
+
+  for(int i=0; i<3; i++) {
+    getRGBValues(fmt, colorsScaledImage[inScreenH*factor-1][inScreenW*factor-1], &r, &g, &b);
+    rSum += r;
+    gSum += g;
+    bSum += b;
+  }
+
   colorsScaledSampledImage[inScreenH*factor-1][inScreenW*factor-1] =
-    SDL_MapRGB(fmt, rSum/4, gSum/4, bSum/4);
+    SDL_MapRGB(fmt, rSum/7, gSum/7, bSum/7);
 
   // RIGHT EDGES
   for (int y = 1; y <= inScreenH*factor-2; y++)
@@ -440,8 +495,16 @@ void applyAntialiasing(
         bSum += b;
       }
     }
+
+    for(int i=0; i<3; i++) {
+        getRGBValues(fmt, colorsScaledImage[y][inScreenW*factor-1], &r, &g, &b);
+        rSum += r;
+        gSum += g;
+        bSum += b;
+    }
+
     colorsScaledSampledImage[y][inScreenW*factor-1] =
-      SDL_MapRGB(fmt, rSum/6, gSum/6, bSum/6);
+      SDL_MapRGB(fmt, rSum/9, gSum/9, bSum/9);
   }
 
   // CENTER
@@ -466,8 +529,15 @@ void applyAntialiasing(
           bSum += b;
         }
       }
+
+      for(int i=0; i<3; i++) {
+        getRGBValues(fmt, colorsScaledImage[y][x], &r, &g, &b);
+        rSum += r;
+        gSum += g;
+        bSum += b;
+      }
       colorsScaledSampledImage[y][x] =
-        SDL_MapRGB(fmt, rSum/9, gSum/9, bSum/9);
+        SDL_MapRGB(fmt, rSum/12, gSum/12, bSum/12);
     }
   }
 
